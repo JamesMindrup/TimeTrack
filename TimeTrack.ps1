@@ -94,3 +94,30 @@ do {
     }
 
 } While (!($XiT))
+
+# Present a summary
+$Totals = @()
+$TaskLogItems = Import-Csv -Path $TaskLogFile
+foreach ($TaskLogItem in $TaskLogItems) {
+    if ($prevTimeStamp) {
+        $MatchFound = $false
+        foreach ($total in $Totals) {
+            if ($total.TaskName -eq $TaskLogItem.TaskName) {
+                $total.Minutes = $total.Minutes + (NEW-TIMESPAN -Start $prevTimeStamp -End $TaskLogItem.TimeStamp)
+                $MatchFound = $true
+                break
+            }
+        }
+        if (!($MatchFound)) {
+            $TempObj = New-Object System.Object
+            $TempObj | Add-Member -type NoteProperty -Name TaskName -Value $TaskLogItem.TaskName
+            $TempObj | Add-Member -type NoteProperty -Name Minutes -Value $timeSpan
+            $Totals += $TempObj
+            Remove-Variable TempObj
+        }
+    }
+    $prevTimeStamp = $TaskLogItem.TimeStamp
+    #$currTask = $TaskLogItem.name
+
+}
+$Totals | Out-GridView
