@@ -63,11 +63,12 @@ $TaskList = ManageListFile -FileName $TaskListFile
 
 do {
     show-menu -TaskList $TaskList
-    $selection = Read-Host "Selection==> "
+    $selection = Read-Host "Selection"
 
     if ($TaskList.CurrentIndex -eq "$($Selection)") {
         foreach ($task in $TaskList) {
             if ($Task.CurrentIndex -eq "$($Selection)") {
+                if ($Task.Name -eq "End") {$XiT = $true}
                 $Task.Active = "True"
                 $Activity = "START"
                 ManageLogFile -FileName $TaskLogFile -Activity $Activity -TaskName $task.name
@@ -91,5 +92,5 @@ do {
 
         $TaskList = ManageListFile -FileName $TaskListFile -TaskList $TaskList
     }
-    Read-Host "press enter to continue"
+
 } While (!($XiT))
