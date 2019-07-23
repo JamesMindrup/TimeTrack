@@ -115,6 +115,7 @@ foreach ($TaskLogItem in $TaskLogItems) {
             $TempObj = New-Object System.Object
             $TempObj | Add-Member -type NoteProperty -Name TaskName -Value $TaskLogItem.TaskName
             $TempObj | Add-Member -type NoteProperty -Name Minutes -Value (NEW-TIMESPAN -Start $prevTimeStamp -End $TaskLogItem.TimeStamp)
+            $TempObj | Add-Member -type NoteProperty -Name Hours -Value ""
             $Totals += $TempObj
             Remove-Variable TempObj
             Write-Verbose "created $($total.TaskName) with $((NEW-TIMESPAN -Start $prevTimeStamp -End $TaskLogItem.TimeStamp)) minutes"
@@ -122,4 +123,8 @@ foreach ($TaskLogItem in $TaskLogItems) {
     }
     $prevTimeStamp = $TaskLogItem.TimeStamp
 }
-$Totals | Out-GridView
+
+foreach ($total in $totals) {
+    $total.Hours = ($total.Minutes.Hours + [math]::Round(($total.Minutes.Minutes/60),2))
+}
+$Totals | Out-GridView -Wait
