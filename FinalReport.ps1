@@ -1,5 +1,6 @@
 #$TaskLogFile = "$([Environment]::GetFolderPath('MyDocuments'))\TaskLog-$((Get-Date).ToString("MMddyyyy")).txt"
-$TaskLogFile = "$([Environment]::GetFolderPath('MyDocuments'))\TaskLog-07222019.txt"
+$VerbosePreference = "Continue"
+$TaskLogFile = "$([Environment]::GetFolderPath('MyDocuments'))\TaskLog-07242019.txt"
 $Totals = @()
 $TaskLogItems = Import-Csv -Path $TaskLogFile
 $prevTimeStamp = $null
@@ -8,7 +9,7 @@ foreach ($TaskLogItem in $TaskLogItems) {
     if ($prevTimeStamp) {
         $MatchFound = $false
         foreach ($total in $Totals) {
-            if ($total.TaskName -eq $TaskLogItem.TaskName) {
+            if ($total.TaskName -eq $currentTask) {
                 $total.Minutes = $total.Minutes + (NEW-TIMESPAN -Start $prevTimeStamp -End $TaskLogItem.TimeStamp)
                 $MatchFound = $true
                 Write-Verbose "Added $((NEW-TIMESPAN -Start $prevTimeStamp -End $TaskLogItem.TimeStamp)) minutes to $($total.TaskName)"
@@ -17,15 +18,17 @@ foreach ($TaskLogItem in $TaskLogItems) {
         }
         if (!($MatchFound)) {
             $TempObj = New-Object System.Object
-            $TempObj | Add-Member -type NoteProperty -Name TaskName -Value $TaskLogItem.TaskName
+            $TempObj | Add-Member -type NoteProperty -Name TaskName -Value $currentTask
             $TempObj | Add-Member -type NoteProperty -Name Minutes -Value (NEW-TIMESPAN -Start $prevTimeStamp -End $TaskLogItem.TimeStamp)
             $TempObj | Add-Member -type NoteProperty -Name Hours -Value ""
             $Totals += $TempObj
+            Write-Verbose "created $($TempObj.TaskName) with $((NEW-TIMESPAN -Start $prevTimeStamp -End $TaskLogItem.TimeStamp)) minutes"
             Remove-Variable TempObj
-            Write-Verbose "created $($total.TaskName) with $((NEW-TIMESPAN -Start $prevTimeStamp -End $TaskLogItem.TimeStamp)) minutes"
         }
     }
     $prevTimeStamp = $TaskLogItem.TimeStamp
+    $currentTask = $TaskLogItem.TaskName
+    write-verbose "Current task changed to $($CurrentTask)"
 }
 
 foreach ($total in $totals) {
