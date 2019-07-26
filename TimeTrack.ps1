@@ -57,8 +57,8 @@ function ManageLogFile ($FileName, $Activity, $TaskName, $VerbosePreference = "S
 
 # ************* Script Body ********************
 $VerbosePreference = "SilentlyContinue"
-$TaskListFile = "$([Environment]::GetFolderPath('MyDocuments'))\TaskList-$((Get-Date).ToString("MMddyyyy")).txt"
-$TaskLogFile = "$([Environment]::GetFolderPath('MyDocuments'))\TaskLog-$((Get-Date).ToString("MMddyyyy")).txt"
+$TaskListFile = "$([Environment]::GetFolderPath('MyDocuments'))\TimeTrack\TaskList-$((Get-Date).ToString("MMddyyyy")).txt"
+$TaskLogFile = "$([Environment]::GetFolderPath('MyDocuments'))\TimeTrack\TaskLog-$((Get-Date).ToString("MMddyyyy")).txt"
 $TaskList = ManageListFile -FileName $TaskListFile
 
 do {
