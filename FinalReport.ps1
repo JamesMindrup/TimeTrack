@@ -1,6 +1,6 @@
 #$TaskLogFile = "$([Environment]::GetFolderPath('MyDocuments'))\TaskLog-$((Get-Date).ToString("MMddyyyy")).txt"
 $VerbosePreference = "Continue"
-$TaskLogFile = "$([Environment]::GetFolderPath('MyDocuments'))\TimeTrack\TaskLog-07242019.txt"
+$TaskLogFile = "$([Environment]::GetFolderPath('MyDocuments'))\TimeTrack\TaskLog-07252019.txt"
 $Totals = @()
 $TaskLogItems = Import-Csv -Path $TaskLogFile
 $prevTimeStamp = $null
