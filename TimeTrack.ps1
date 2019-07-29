@@ -1,8 +1,8 @@
 function show-menu ($TaskList,$VerbosePreference = "SilentlyContinue") {
     Clear-Host
     Write-Verbose "show-menu: entered"
-    Write-Host "Select a task to start (this stops the currently active one)"
-    Write-Host "============================================================"
+    Write-Host "Select a task to start"
+    Write-Host "======================="
     $i = 1
     foreach ($task in $TaskList) {
         $task.currentindex = $i
