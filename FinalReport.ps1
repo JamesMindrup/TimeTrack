@@ -1,6 +1,7 @@
-#$TaskLogFile = "$([Environment]::GetFolderPath('MyDocuments'))\TaskLog-$((Get-Date).ToString("MMddyyyy")).txt"
+. G:\Repos\PoshBits\GUIFilePicker.ps1
+
 $VerbosePreference = "Continue"
-$TaskLogFile = "$([Environment]::GetFolderPath('MyDocuments'))\TimeTrack\TaskLog-07252019.txt"
+$TaskLogFile = Get-FileName -initialDirectory "$([Environment]::GetFolderPath('MyDocuments'))\TimeTrack"
 $Totals = @()
 $TaskLogItems = Import-Csv -Path $TaskLogFile
 $prevTimeStamp = $null
