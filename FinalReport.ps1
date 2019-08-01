@@ -35,4 +35,4 @@ foreach ($TaskLogItem in $TaskLogItems) {
 foreach ($total in $totals) {
     $total.Hours = ($total.Minutes.Hours + [math]::Round(($total.Minutes.Minutes/60),2))
 }
-$Totals | Out-GridView
+$Totals | Out-GridView -Title "Results from '$($TaskLogFile)'"
