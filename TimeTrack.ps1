@@ -16,7 +16,7 @@ function show-menu ($TaskList,$VerbosePreference = "SilentlyContinue") {
     Write-Host "$($i). NEW Task"
 }
 
-function ManageListFile ($FileName, $TaskList, $VerbosePreference = "SilentlyContinue") {
+function ManageListFile ($FileName, $TaskList, $VerbosePreference = "Continue") {
     Write-Verbose "ManageListFile: entered"
     if ($null -eq $TaskList) {
         if (!(test-path $FileName)) {
@@ -36,12 +36,20 @@ function ManageListFile ($FileName, $TaskList, $VerbosePreference = "SilentlyCon
             Remove-Variable TempObj
         }
         $TaskList = Import-Csv -Path $TaskListFile
-
     }
     else {
         $TaskList | Export-Csv -NoTypeInformation -Path $FileName -Force
     }
+
+    #remove old list files
+    $FilePathFull = $FileName.split("\")
+    for ($loop=0;$loop -lt $FilePathFull.GetUpperBound(0);$loop++) {
+        if ($loop -eq 0) {$FilePathRoot = $FilePathFull[$loop]}
+        else {$FilePathRoot = $FilePathRoot + "\" + $FilePathFull[$loop]}
+    }
+    Get-ChildItem $FilePathRoot | where-object {($_.name -match 'TaskList-\d{8}\.txt') -and ($_.name -ne $FilePathFull[$FilePathFull.GetUpperBound(0)])} | ForEach-Object {Remove-item $_.FullName}
     
+    #return the list
     Return $TaskList
 }
 
