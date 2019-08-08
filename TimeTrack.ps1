@@ -88,7 +88,8 @@ do {
     }
     else {
         foreach ($task in $TaskList) {$Task.Active = "False"}
-        $NewTaskName = Read-Host "Enter the task name"
+        if ($selection -match '^\d+$') {$NewTaskName = Read-Host "Enter the task name"}
+        else {$NewTaskName = $selection}
         $TempObj = New-Object System.Object
         $TempObj | Add-Member -type NoteProperty -Name Name -Value $NewTaskName
         $TempObj | Add-Member -type NoteProperty -Name Active -Value "True"
