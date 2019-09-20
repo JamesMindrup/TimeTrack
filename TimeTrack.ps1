@@ -1,14 +1,16 @@
-function show-menu ($TaskList,$VerbosePreference = "SilentlyContinue") {
+function show-menu ($TaskList,$highlight = "Green",$VerbosePreference = "SilentlyContinue") {
     Clear-Host
     Write-Verbose "show-menu: entered"
     Write-Host "Select a task to start"
+    Write-Host "(* = Active)"
     Write-Host "======================="
     $i = 1
     foreach ($task in $TaskList) {
         $task.currentindex = $i
         if ($task.active -eq "True") {
-            Write-Host "$($i). $($task.Name)" -NoNewline
-            Write-Host " (active)" -ForegroundColor Green
+            Write-Host "$($i)." -NoNewline
+            Write-Host "*" -ForegroundColor $highlight -NoNewline
+            Write-Host "$($task.Name)"
         }
         else {Write-Host "$($i). $($task.Name)"}
         $i++
@@ -70,7 +72,7 @@ $TaskLogFile = "$([Environment]::GetFolderPath('MyDocuments'))\TimeTrack\TaskLog
 $TaskList = ManageListFile -FileName $TaskListFile
 
 do {
-    show-menu -TaskList $TaskList
+    show-menu -TaskList $TaskList -highlight "Cyan"
     $selection = Read-Host "Selection"
 
     if ($TaskList.CurrentIndex -eq "$($Selection)") {
