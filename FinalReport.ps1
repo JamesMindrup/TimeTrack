@@ -7,32 +7,35 @@ $grandTotal = 0
 $TaskLogItems = Import-Csv -Path $TaskLogFile
 $prevTimeStamp = $null
 foreach ($TaskLogItem in $TaskLogItems) {
-    Write-Verbose "$($TaskLogItem.TimeStamp) $($TaskLogItem.Activity) $($TaskLogItem.Taskname) ::: $($prevTimeStamp)"
-    if ($prevTimeStamp) {
-        $MatchFound = $false
-        foreach ($total in $Totals) {
-            if ($total.TaskName -eq $currentTask) {
+    Write-Verbose "$($TaskLogItem.TimeStamp) $($TaskLogItem.Activity) $($TaskLogItem.Taskname) ::: $($currentTask) $($prevTimeStamp)"
+    if ($currentTask -ne "End") {
+        if ($prevTimeStamp) {
+            $MatchFound = $false
+            foreach ($total in $Totals) {
+                if ($total.TaskName -eq $currentTask) {
+                    $addMinutes = (NEW-TIMESPAN -Start $prevTimeStamp -End $TaskLogItem.TimeStamp)
+                    $total.Minutes = $total.Minutes + $addMinutes
+                    $grandTotal = $grandTotal + $addMinutes
+                    $MatchFound = $true
+                    Write-Verbose "Added $((NEW-TIMESPAN -Start $prevTimeStamp -End $TaskLogItem.TimeStamp)) minutes to $($total.TaskName)"
+                    Remove-Variable addMinutes
+                    break
+                }
+            }
+            if (!($MatchFound)) {
                 $addMinutes = (NEW-TIMESPAN -Start $prevTimeStamp -End $TaskLogItem.TimeStamp)
-                $total.Minutes = $total.Minutes + $addMinutes
                 $grandTotal = $grandTotal + $addMinutes
-                $MatchFound = $true
-                Write-Verbose "Added $((NEW-TIMESPAN -Start $prevTimeStamp -End $TaskLogItem.TimeStamp)) minutes to $($total.TaskName)"
-                Remove-Variable addMinutes
-                break
+                $TempObj = New-Object System.Object
+                $TempObj | Add-Member -type NoteProperty -Name TaskName -Value $currentTask
+                $TempObj | Add-Member -type NoteProperty -Name Minutes -Value $addMinutes
+                $TempObj | Add-Member -type NoteProperty -Name Hours -Value ""
+                $Totals += $TempObj
+                Write-Verbose "created $($TempObj.TaskName) with $((NEW-TIMESPAN -Start $prevTimeStamp -End $TaskLogItem.TimeStamp)) minutes"
+                Remove-Variable TempObj,addMinutes
             }
         }
-        if (!($MatchFound)) {
-            $addMinutes = (NEW-TIMESPAN -Start $prevTimeStamp -End $TaskLogItem.TimeStamp)
-            $grandTotal = $grandTotal + $addMinutes
-            $TempObj = New-Object System.Object
-            $TempObj | Add-Member -type NoteProperty -Name TaskName -Value $currentTask
-            $TempObj | Add-Member -type NoteProperty -Name Minutes -Value $addMinutes
-            $TempObj | Add-Member -type NoteProperty -Name Hours -Value ""
-            $Totals += $TempObj
-            Write-Verbose "created $($TempObj.TaskName) with $((NEW-TIMESPAN -Start $prevTimeStamp -End $TaskLogItem.TimeStamp)) minutes"
-            Remove-Variable TempObj,addMinutes
-        }
     }
+    else {write-verbose "skipped processing for END"}
     $prevTimeStamp = $TaskLogItem.TimeStamp
     $currentTask = $TaskLogItem.TaskName
     write-verbose "Current task changed to $($CurrentTask)"
