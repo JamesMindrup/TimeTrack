@@ -74,36 +74,40 @@ $TaskList = ManageListFile -FileName $TaskListFile
 do {
     show-menu -TaskList $TaskList -highlight "Cyan"
     $selection = Read-Host "Selection"
-
-    if ($TaskList.CurrentIndex -eq "$($Selection)") {
-        foreach ($task in $TaskList) {
-            if ($Task.CurrentIndex -eq "$($Selection)") {
-                if ($Task.Name -eq "End") {$XiT = $true}
-                $Task.Active = "True"
-                $Activity = "START"
-                ManageLogFile -FileName $TaskLogFile -Activity $Activity -TaskName $task.name
-                Remove-Variable Activity
+    if ($selection.Length -gt 0) {
+        if ($TaskList.CurrentIndex -eq "$($Selection)") {
+            foreach ($task in $TaskList) {
+                if ($Task.CurrentIndex -eq "$($Selection)") {
+                    if ($Task.Name -eq "End") {$XiT = $true}
+                    $Task.Active = "True"
+                    $Activity = "START"
+                    ManageLogFile -FileName $TaskLogFile -Activity $Activity -TaskName $task.name
+                    Remove-Variable Activity
+                }
+                else {$Task.Active = "False"}
             }
-            else {$Task.Active = "False"}
+            $TaskList = ManageListFile -FileName $TaskListFile -TaskList $TaskList
         }
-        $TaskList = ManageListFile -FileName $TaskListFile -TaskList $TaskList
+        else {
+            foreach ($task in $TaskList) {$Task.Active = "False"}
+            if ($selection -match '^\d+$') {$NewTaskName = Read-Host "Enter the task name"}
+            else {$NewTaskName = $selection}
+            $TempObj = New-Object System.Object
+            $TempObj | Add-Member -type NoteProperty -Name Name -Value $NewTaskName
+            $TempObj | Add-Member -type NoteProperty -Name Active -Value "True"
+            $TempObj | Add-Member -type NoteProperty -Name CurrentIndex -Value 0
+            $TaskList += $TempObj
+            $Activity = "START"
+            ManageLogFile -FileName $TaskLogFile -Activity $Activity -TaskName $TempObj.name
+            Remove-Variable TempObj,Activity
+
+            $TaskList = ManageListFile -FileName $TaskListFile -TaskList $TaskList
+        }
     }
     else {
-        foreach ($task in $TaskList) {$Task.Active = "False"}
-        if ($selection -match '^\d+$') {$NewTaskName = Read-Host "Enter the task name"}
-        else {$NewTaskName = $selection}
-        $TempObj = New-Object System.Object
-        $TempObj | Add-Member -type NoteProperty -Name Name -Value $NewTaskName
-        $TempObj | Add-Member -type NoteProperty -Name Active -Value "True"
-        $TempObj | Add-Member -type NoteProperty -Name CurrentIndex -Value 0
-        $TaskList += $TempObj
-        $Activity = "START"
-        ManageLogFile -FileName $TaskLogFile -Activity $Activity -TaskName $TempObj.name
-        Remove-Variable TempObj,Activity
-
-        $TaskList = ManageListFile -FileName $TaskListFile -TaskList $TaskList
+        Write-Host "you didn't enter anything...leaving it where it was"
+        Start-Sleep -Seconds 5
     }
-
 } While (!($XiT))
 
 # Present a summary
