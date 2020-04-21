@@ -57,6 +57,7 @@ function ManageListFile ($FileName, $TaskList, $VerbosePreference = "Continue") 
 
 function ManageLogFile ($FileName, $Activity, $TaskName, $VerbosePreference = "SilentlyContinue") {
     Write-Verbose "ManageLogFile: entered"
+    # !! need to verify path
     $TempObj = New-Object System.Object
     $TempObj | Add-Member -type NoteProperty -Name TimeStamp -Value (Get-Date).ToString()
     $TempObj | Add-Member -type NoteProperty -Name Activity -Value $Activity
