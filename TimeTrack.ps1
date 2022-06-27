@@ -2,7 +2,9 @@ function show-menu ($TaskList,$highlight = "Green",$VerbosePreference = "Silentl
     Clear-Host
     Write-Verbose "show-menu: entered"
     Write-Host "Select a task to start"
-    Write-Host "(* = Active)"
+    Write-Host "(" -NoNewline
+    Write-Host "*" -ForegroundColor $highlight -NoNewline
+    Write-Host " = Active)"
     Write-Host "======================="
     $i = 1
     foreach ($task in $TaskList) {
@@ -18,7 +20,7 @@ function show-menu ($TaskList,$highlight = "Green",$VerbosePreference = "Silentl
     Write-Host "$($i). NEW Task"
 }
 
-function ManageListFile ($FileName, $TaskList, $VerbosePreference = "Continue") {
+function ManageListFile ($pathRoot, $FileName, $TaskList, $VerbosePreference = "Continue") {
     Write-Verbose "ManageListFile: entered"
     if ($null -eq $TaskList) {
         if (!(test-path $FileName)) {
@@ -44,12 +46,7 @@ function ManageListFile ($FileName, $TaskList, $VerbosePreference = "Continue") 
     }
 
     #remove old list files
-    $FilePathFull = $FileName.split("\")
-    for ($loop=0;$loop -lt $FilePathFull.GetUpperBound(0);$loop++) {
-        if ($loop -eq 0) {$FilePathRoot = $FilePathFull[$loop]}
-        else {$FilePathRoot = $FilePathRoot + "\" + $FilePathFull[$loop]}
-    }
-    Get-ChildItem $FilePathRoot | where-object {($_.name -match 'TaskList-\d{8}\.txt') -and ($_.name -ne $FilePathFull[$FilePathFull.GetUpperBound(0)])} | ForEach-Object {Remove-item $_.FullName}
+    Get-ChildItem $pathRoot | where-object {($_.name -match 'TaskList-\d{8}\.txt') -and ($_.FullName -ne $FileName)} | ForEach-Object {Remove-item $_.FullName}
     
     #return the list
     Return $TaskList
@@ -68,9 +65,11 @@ function ManageLogFile ($FileName, $Activity, $TaskName, $VerbosePreference = "S
 
 # ************* Script Body ********************
 $VerbosePreference = "SilentlyContinue"
-$TaskListFile = "$([Environment]::GetFolderPath('MyDocuments'))\TimeTrack\TaskList-$((Get-Date).ToString("MMddyyyy")).txt"
+$pathRoot = Join-Path -Path $([Environment]::GetFolderPath('MyDocuments')) -ChildPath "TimeTrack"
+if (!(Test-Path $pathRoot)) {New-Item -Path $pathRoot -ItemType directory}
+$TaskListFile = Join-Path -Path $pathRoot -ChildPath "TaskList-$((Get-Date).ToString("MMddyyyy")).txt"
 $TaskLogFile = "$([Environment]::GetFolderPath('MyDocuments'))\TimeTrack\TaskLog-$((Get-Date).ToString("MMddyyyy")).txt"
-$TaskList = ManageListFile -FileName $TaskListFile
+$TaskList = ManageListFile -pathRoot $pathRoot -FileName $TaskListFile
 
 do {
     show-menu -TaskList $TaskList -highlight "Cyan"
