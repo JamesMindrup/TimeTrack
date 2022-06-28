@@ -1,4 +1,4 @@
-. C:\Repo\Personal\PoshBits\GUIFilePicker.ps1
+. (Join-Path -Path $PSScriptRoot.replace("TimeTrack","PoshBits") -ChildPath "GUIFilePicker.ps1")
 
 $VerbosePreference = "Continue"
 $TaskLogFile = Get-FileName -initialDirectory "$([Environment]::GetFolderPath('MyDocuments'))\TimeTrack"
